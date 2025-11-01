@@ -5,7 +5,7 @@ FROM ubuntu/python:3.12-24.04_stable
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 更新系统并安装必要的软件包
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get upgrade
 RUN apt-get install -y --no-install-recommends \
     vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates \
     && apt-get clean \
