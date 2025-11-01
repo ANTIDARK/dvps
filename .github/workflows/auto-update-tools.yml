@@ -1,0 +1,84 @@
+name: Auto-update tools
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # 每天 08:00 UTC
+  workflow_dispatch:      # 手动触发
+
+jobs:
+  update-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------- 获取uv,uvx（最新版） ----------
+      - name: Get latest uv release tag
+        id: uv_remote
+        run: |
+          tag=$(curl -sSf https://api.github.com/repos/astral-sh/uv/releases/latest | jq -r .tag_name)
+          echo "tag=${tag}" >> $GITHUB_OUTPUT
+
+      - name: Check uv local record
+        id: uv_cmp
+        run: |
+          local=$(cat .uv-version 2>/dev/null || echo "")
+          remote="${{ steps.uv_remote.outputs.tag }}"
+          echo "uv local: $local"
+          echo "uv remote: $remote"
+          [ "$local" = "$remote" ] && echo "up_to_date=true" >> $GITHUB_OUTPUT || echo "up_to_date=false" >> $GITHUB_OUTPUT
+
+      - name: Download & install uv
+        if: steps.uv_cmp.outputs.up_to_date == 'false'
+        run: |
+          tag="${{ steps.uv_remote.outputs.tag }}"
+          mkdir -p club/bin
+          cd club/bin
+          curl -sSfL -o uv.tar.gz "https://github.com/astral-sh/uv/releases/download/${tag}/uv-x86_64-unknown-linux-gnu.tar.gz"
+          tar -xzf uv.tar.gz
+          mv uv-x86_64-unknown-linux-gnu/uv .
+          mv uv-x86_64-unknown-linux-gnu/uvx . 2>/dev/null || true
+          rm -rf uv.tar.gz uv-x86_64-unknown-linux-gnu
+          chmod +x uv uvx
+
+      # ---------- 获取dufs （最新版） ----------
+      - name: Get latest dufs release tag
+        id: dufs_remote
+        run: |
+          tag=$(curl -sSf https://api.github.com/repos/sigoden/dufs/releases/latest | jq -r .tag_name)
+          echo "tag=${tag}" >> $GITHUB_OUTPUT
+
+      - name: Check dufs local record
+        id: dufs_cmp
+        run: |
+          local=$(cat .dufs-version 2>/dev/null || echo "")
+          remote="${{ steps.dufs_remote.outputs.tag }}"
+          echo "dufs local: $local"
+          echo "dufs remote: $remote"
+          [ "$local" = "$remote" ] && echo "up_to_date=true" >> $GITHUB_OUTPUT || echo "up_to_date=false" >> $GITHUB_OUTPUT
+
+      - name: Download & install dufs
+        if: steps.dufs_cmp.outputs.up_to_date == 'false'
+        run: |
+          tag="${{ steps.dufs_remote.outputs.tag }}"
+          mkdir -p club/bin
+          cd club/bin
+          curl -sSfL -o dufs.tar.gz "https://github.com/sigoden/dufs/releases/download/${tag}/dufs-${tag}-x86_64-unknown-linux-musl.tar.gz"
+          tar -xzf dufs.tar.gz
+          # 解压目录名随版本变化，用通配符保险
+          mv dufs-*-x86_64-unknown-linux-musl/dufs . 2>/dev/null || mv dufs .
+          rm -rf dufs.tar.gz dufs-*-*
+          chmod +x dufs
+
+      # ---------- 版本记录 & 提交 ----------
+      - name: Update version records
+        run: |
+          [ "${{ steps.uv_cmp.outputs.up_to_date }}" = "false" ] && echo "${{ steps.uv_remote.outputs.tag }}" > .uv-version
+          [ "${{ steps.dufs_cmp.outputs.up_to_date }}" = "false" ] && echo "${{ steps.dufs_remote.outputs.tag }}" > .dufs-version
+
+      - name: Commit & push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add club/bin .uv-version .dufs-version
+          git diff --cached --quiet || (git commit -m "chore: update uv & dufs binaries" && git push)
