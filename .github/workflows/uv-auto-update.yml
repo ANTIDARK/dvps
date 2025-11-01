@@ -1,0 +1,63 @@
+# .github/workflows/uv-auto-update.yml
+name: Auto-update uv
+
+on:
+  schedule:
+    # 每天 08:00 UTC 检查一次
+    - cron: '0 8 * * *'
+  workflow_dispatch:   # 也允许手动触发
+
+jobs:
+  update-uv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout self
+        uses: actions/checkout@v4
+
+      - name: Get latest release tag from astral-sh/uv
+        id: remote
+        run: |
+          tag=$(curl -sSf https://api.github.com/repos/astral-sh/uv/releases/latest | jq -r .tag_name)
+          echo "tag=${tag}" >> $GITHUB_OUTPUT
+
+      - name: Compare with local record
+        id: cmp
+        run: |
+          if [ -f .uv-version ]; then
+            local=$(cat .uv-version)
+          else
+            local=""
+          fi
+          remote="${{ steps.remote.outputs.tag }}"
+          echo "local=${local}"
+          echo "remote=${remote}"
+          if [ "$local" = "$remote" ]; then
+            echo "up_to_date=true" >> $GITHUB_OUTPUT
+          else
+            echo "up_to_date=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download & install uv
+        if: steps.cmp.outputs.up_to_date == 'false'
+        run: |
+          tag="${{ steps.remote.outputs.tag }}"
+          url="https://github.com/astral-sh/uv/releases/download/${tag}/uv-x86_64-unknown-linux-gnu.tar.gz"
+          mkdir -p /club/bin
+          cd /tmp
+          curl -sSfL -o uv.tar.gz "$url"
+          tar -xzf uv.tar.gz
+          mv uv /club/bin/uv
+          chmod +x /club/bin/uv
+          /club/bin/uv --version   # 验证
+
+      - name: Record new version
+        if: steps.cmp.outputs.up_to_date == 'false'
+        run: echo "${{ steps.remote.outputs.tag }}" > .uv-version
+
+      - name: Commit & push version file
+        if: steps.cmp.outputs.up_to_date == 'false'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .uv-version
+          git diff --cached --quiet || (git commit -m "chore: bump uv to ${{ steps.remote.outputs.tag }}" && git push)
