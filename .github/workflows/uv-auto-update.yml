@@ -1,17 +1,16 @@
-# .github/workflows/uv-auto-update.yml
 name: Auto-update uv
 
 on:
   schedule:
-    # 每天 08:00 UTC 检查一次
-    - cron: '0 8 * * *'
-  workflow_dispatch:   # 也允许手动触发
+    - cron: '0 8 * * *'  # 每天 08:00 UTC 执行
+  workflow_dispatch:     # 支持手动触发
 
 jobs:
   update-uv:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout self
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Get latest release tag from astral-sh/uv
@@ -37,27 +36,25 @@ jobs:
             echo "up_to_date=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Download & install uv
+      - name: Download and extract uv
         if: steps.cmp.outputs.up_to_date == 'false'
         run: |
           tag="${{ steps.remote.outputs.tag }}"
           url="https://github.com/astral-sh/uv/releases/download/${tag}/uv-x86_64-unknown-linux-gnu.tar.gz"
-          mkdir -p /club/bin
-          cd /tmp
+          cd club/bin
           curl -sSfL -o uv.tar.gz "$url"
           tar -xzf uv.tar.gz
-          mv uv /club/bin/uv
-          chmod +x /club/bin/uv
-          /club/bin/uv --version   # 验证
+          rm uv.tar.gz
+          chmod +x uv uvx
 
-      - name: Record new version
+      - name: Update version record
         if: steps.cmp.outputs.up_to_date == 'false'
         run: echo "${{ steps.remote.outputs.tag }}" > .uv-version
 
-      - name: Commit & push version file
+      - name: Commit and push changes
         if: steps.cmp.outputs.up_to_date == 'false'
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .uv-version
-          git diff --cached --quiet || (git commit -m "chore: bump uv to ${{ steps.remote.outputs.tag }}" && git push)
+          git add club/bin uv .uv-version
+          git diff --cached --quiet || (git commit -m "chore: update uv to ${{ steps.remote.outputs.tag }}" && git push)
