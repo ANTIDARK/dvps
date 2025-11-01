@@ -45,7 +45,6 @@ jobs:
           curl -sSfL -o uv.tar.gz "$url"
           tar -xzf uv.tar.gz
           rm uv.tar.gz
-          chmod +x uv uvx
 
       - name: Update version record
         if: steps.cmp.outputs.up_to_date == 'false'
