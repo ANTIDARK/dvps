@@ -46,6 +46,7 @@ jobs:
           tar -xzf uv.tar.gz
           cp uv-x86_64-unknown-linux-gnu/u* ./
           rm uv.tar.gz uv-x86_64-unknown-linux-gnu
+          chmod +x uv uvx
 
       - name: Update version record
         if: steps.cmp.outputs.up_to_date == 'false'
