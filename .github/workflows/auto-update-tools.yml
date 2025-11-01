@@ -65,8 +65,8 @@ jobs:
           cd club/bin
           curl -sSfL -o dufs.tar.gz "https://github.com/sigoden/dufs/releases/download/${tag}/dufs-${tag}-x86_64-unknown-linux-musl.tar.gz"
           tar -xzf dufs.tar.gz
-          # 把解压后任何位置的 dufs 可执行文件移到当前目录
-          find . -type f -name dufs -executable -exec mv -t . {} +
+          # 把解压后任何位置的 dufs 可执行文件移到当前目录，解压无文件夹
+          # find . -type f -name dufs -executable -exec mv -t . {} +
           # 清理压缩包和目录
           rm -rf dufs.tar.gz dufs-*-*
           chmod +x dufs
