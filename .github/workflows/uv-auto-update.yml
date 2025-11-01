@@ -50,7 +50,7 @@ jobs:
         if: steps.cmp.outputs.up_to_date == 'false'
         run: echo "${{ steps.remote.outputs.tag }}" > .uv-version
 
-            - name: Commit and push changes
+      - name: Commit and push changes
         if: steps.cmp.outputs.up_to_date == 'false'
         run: |
           git config user.name "github-actions[bot]"
