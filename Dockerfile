@@ -1,13 +1,13 @@
-# 使用python镜像
-FROM ubuntu/python:3.12-24.04_stable
+# 使用debian镜像
+FROM debian:trixie-backports
 
 # 设置环境变量，避免交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 更新系统并安装必要的软件包
-RUN apt-get update
+RUN apt-get update apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
-    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates \
+    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv\
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
