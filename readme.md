@@ -1,6 +1,6 @@
 # 复刻自https://github.com/CJSen/club
 # 与它的的区别
-更改基础镜像为debian:trixie-backports,安装了完整版python3,git
+更改基础镜像为debian:trixie-backports,安装了python3 python3-pip python3-venv python3-tk git 
 
 # ClawCloud 环境说明
 
