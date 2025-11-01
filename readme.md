@@ -1,3 +1,6 @@
+# 复刻自https://github.com/CJSen/club,与它的的区别
+更改基础镜像为debian:trixie-backports,安装了完整版python3
+
 # ClawCloud 环境说明
 
 在使用 ClawCloud 过程中，发现其使用k8s的pod容器，所以在重启或者其他操作后，会还原系统，而且不能挂载整个“/”目录做持久化，所以搞了一个自用镜像。
