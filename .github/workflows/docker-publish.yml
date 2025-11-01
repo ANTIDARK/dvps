@@ -1,9 +1,7 @@
 name: Build and Publish Docker image
 
 on:
-  push:
-    tags:
-      - "*"
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -26,11 +24,15 @@ jobs:
       - name: Set lowercase owner
         run: echo "REPO_OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
 
+      - name: Set timestamp
+        id: ts
+        run: echo "stamp=$(date -u +'%Y%m%d-%H%M%S')" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_OWNER_LC }}/${{ github.event.repository.name }}:${{ github.ref_name }}
+            ghcr.io/${{ env.REPO_OWNER_LC }}/${{ github.event.repository.name }}:${{ steps.ts.outputs.stamp }}
             ghcr.io/${{ env.REPO_OWNER_LC }}/${{ github.event.repository.name }}:latest
