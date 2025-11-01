@@ -4,12 +4,15 @@ FROM debian:trixie-backports
 # 设置环境变量，避免交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 更新系统并安装必要的软件包
-RUN apt-get update apt-get upgrade -y
-RUN apt-get install -y --no-install-recommends \
-    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv\
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# 1. 先更新索引
+RUN apt-get update -qq && \
+    # 2. 再升级已装包（非必须，可省）
+    apt-get upgrade -y && \
+    # 3. 安装你需要的工具，最后清理缓存
+    apt-get install -y --no-install-recommends \
+    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 创建club用户并设置密码，同时将其加入sudo组
 RUN useradd -m -s /bin/bash club \
