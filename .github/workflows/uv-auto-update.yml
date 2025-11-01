@@ -44,7 +44,8 @@ jobs:
           cd club/bin
           curl -sSfL -o uv.tar.gz "$url"
           tar -xzf uv.tar.gz
-          rm uv.tar.gz
+          cp uv-x86_64-unknown-linux-gnu/u* ./
+          rm uv.tar.gz uv-x86_64-unknown-linux-gnu
 
       - name: Update version record
         if: steps.cmp.outputs.up_to_date == 'false'
