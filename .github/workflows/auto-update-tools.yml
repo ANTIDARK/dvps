@@ -74,8 +74,8 @@ jobs:
       # ---------- 版本记录 & 提交 ----------
       - name: Update version records
         run: |
-          [ "${{ steps.uv_cmp.outputs.up_to_date }}" = "false" ] && echo "${{ steps.uv_remote.outputs.tag }}" > .uv-version
-          [ "${{ steps.dufs_cmp.outputs.up_to_date }}" = "false" ] && echo "${{ steps.dufs_remote.outputs.tag }}" > .dufs-version
+          [ "${{ steps.uv_cmp.outputs.up_to_date }}" = "false" ] && echo "${{ steps.uv_remote.outputs.tag }}" > .uv-version  || true
+          [ "${{ steps.dufs_cmp.outputs.up_to_date }}" = "false" ] && echo "${{ steps.dufs_remote.outputs.tag }}" > .dufs-version  || true
 
       - name: Commit & push changes
         run: |
