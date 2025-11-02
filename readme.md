@@ -1,7 +1,7 @@
-# 复刻自https://github.com/CJSen/club
-# 与它的的区别
-更改基础镜像为debian:trixie-backports,安装了python3 python3-pip python3-venv python3-tk git 
+# 本仓库说明
+本仓库更改基础镜像为debian:trixie-backports,安装了python3 python3-pip python3-venv python3-tk（暂未安装） git ；如果需要自定义镜像可fork此词库，在Dockerfile里的12行增加需部署的软件，然后在actions里选择docker-publish.yml以构建镜像，会自动推送到仓库页面右侧的package
 
+# 以下为原仓库说明
 # ClawCloud 环境说明
 
 在使用 ClawCloud 过程中，发现其使用k8s的pod容器，所以在重启或者其他操作后，会还原系统，而且不能挂载整个“/”目录做持久化，所以搞了一个自用镜像。
