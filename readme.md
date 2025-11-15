@@ -1,5 +1,5 @@
 # 本仓库说明
-本仓库更改基础镜像为debian:trixie-backports,安装了python3 python3-pip python3-venv python3-tk（暂未安装） git ；如果需要自定义镜像可fork此词库，在Dockerfile里的12行增加需部署的软件，然后在actions里选择docker-publish.yml以构建镜像，会自动推送到仓库页面右侧的package
+本仓库更改基础镜像为debian:trixie-20251103,安装了python3 python3-pip python3-venv ~~python3-tk~~ git ；如果需要自定义镜像可fork此词库，在Dockerfile里的12行增加需部署的软件，然后在actions里选择docker-publish.yml以构建镜像，会自动推送到仓库页面右侧的package
 
 # 以下为原仓库说明
 # ClawCloud 环境说明
