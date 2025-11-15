@@ -1,5 +1,5 @@
 # 使用debian镜像
-FROM debian:trixie-backports
+FROM debian:trixie-20251103
 
 # 设置环境变量，避免交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
