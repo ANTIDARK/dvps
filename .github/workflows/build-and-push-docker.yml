@@ -21,6 +21,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest  # 使用最新版 Ubuntu 运行器
+    # 新增：强制使用 Node.js 24 运行 Action
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       contents: read        # 读取仓库内容权限
       packages: write       # 推送 GHCR 镜像的权限（如需）
