@@ -18,7 +18,7 @@ RUN useradd -m -s /bin/bash club \
     && echo "club:123456" | chpasswd \
     # && usermod -aG sudo club
     addgroup club wheel && \
-    echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "club ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # 将当前目录的所有文件复制到容器的 /club 目录下
 COPY ./club/bin /club/bin
