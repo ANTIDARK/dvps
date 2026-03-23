@@ -64,7 +64,7 @@ if [ ! -d "/root/bin" ]; then
 fi
 
 # 第二步：遍历目标目录下的所有条目
-for file in "/root/bin"/*; do
+for file in /root/bin/*; do
     # 过滤：仅处理普通文件（排除目录、符号链接、设备文件等）
     if [ -f "$file" ]; then
         # 获取纯文件名（去掉路径，只保留文件名）
@@ -84,7 +84,7 @@ done
 
 echo -e "\n/root/bin目录下可执行文件已加入执行权限"
 
-export PATH=“/root/bin:$PATH”
+export PATH=/root/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # 执行传入的命令，通常是启动 supervisord
 exec "$@"
