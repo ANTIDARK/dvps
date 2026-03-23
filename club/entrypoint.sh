@@ -57,8 +57,8 @@ fi
 echo "club:$CLUB_PWD" | chpasswd
 
 # 第一步：检查目标目录是否存在，不存在则退出
-if [ ! -d "$TARGET_DIR" ]; then
-    echo "【错误】目录 $TARGET_DIR 不存在，脚本退出！"
+if [ ! -d /root/bin ]; then
+    echo "【错误】目录 /root/bin 不存在，脚本退出！"
     exit 1
 fi
 
