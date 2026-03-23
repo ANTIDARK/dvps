@@ -53,5 +53,7 @@ else
 fi
 echo "club:$CLUB_PWD" | chpasswd
 
+export PATH=“/root/bin:$PATH”
+
 # 执行传入的命令，通常是启动 supervisord
 exec "$@"
