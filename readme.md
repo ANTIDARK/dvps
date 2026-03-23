@@ -1,3 +1,7 @@
+# 我的修改：
+改基础镜像为debian：trixie-slim
+增加安装git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip 等软件
+
 # ClawCloud 环境说明
 
 在使用 ClawCloud 过程中，发现其使用k8s的pod容器，所以在重启或者其他操作后，会还原系统，而且不能挂载整个“/”目录做持久化，所以搞了一个自用镜像。
