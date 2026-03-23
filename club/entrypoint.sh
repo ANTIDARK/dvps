@@ -28,6 +28,7 @@ if [ ! -f "/root/init/.initialized" ]; then
 
     # 创建标记文件，表示已初始化
     touch /root/init/.initialized
+    touch /root/init/.club
     echo "初始化完成"
 else
     echo "检测到已初始化，跳过初始化步骤..."
