@@ -1,20 +1,24 @@
 # 使用较小的基础镜像
-FROM ubuntu:22.04
+FROM debian:trixie-slim
 
 # 设置环境变量，避免交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 更新系统并安装必要的软件包
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
-    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# 1. 先更新索引
+RUN apt-get update -qq && \
+    # 2. 再升级已装包（非必须，可省）
+    apt-get upgrade -y && \
+    # 3. 安装你需要的工具，最后清理缓存
+    apt-get install -y --no-install-recommends \
+    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# 创建club用户并设置密码，同时将其加入sudo组
+# 创建club用户并设置密码，同时将其加入sudo组,配置密码sudo
 RUN useradd -m -s /bin/bash club \
     && echo "club:123456" | chpasswd \
-    && usermod -aG sudo club
+    # && usermod -aG sudo club
+    addgroup club wheel && \
+    echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # 将当前目录的所有文件复制到容器的 /club 目录下
 COPY ./club/bin /club/bin
