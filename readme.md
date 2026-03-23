@@ -1,7 +1,12 @@
 # 我的修改：
 改基础镜像为debian：trixie-slim
-增加安装git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip 等软件
+增加安装 python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip 等软件
+修改/root文件夹下布局
+优化supervisor的配置文件降低资源占用
+重写docker构建workflow,现仅支持x86
 
+
+# 以下为原说明
 # ClawCloud 环境说明
 
 在使用 ClawCloud 过程中，发现其使用k8s的pod容器，所以在重启或者其他操作后，会还原系统，而且不能挂载整个“/”目录做持久化，所以搞了一个自用镜像。
