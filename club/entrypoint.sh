@@ -56,10 +56,9 @@ else
 fi
 echo "club:$CLUB_PWD" | chpasswd
 
-
 # 第一步：检查目标目录是否存在，不存在则退出
-if [ ! -d "/root/bin" ]; then
-    echo "【错误】目录 /root/bin 不存在，脚本退出！"
+if [ ! -d "$TARGET_DIR" ]; then
+    echo "【错误】目录 $TARGET_DIR 不存在，脚本退出！"
     exit 1
 fi
 
@@ -70,21 +69,30 @@ for file in /root/bin/*; do
         # 获取纯文件名（去掉路径，只保留文件名）
         filename=$(basename "$file")
         
-        # 判断：文件名中是否包含 "."（即是否有后缀）
-        if [[ "$filename" != *.* ]]; then
-            # 给无后缀文件添加执行权限
-            chmod +x "$file"
-            echo "【成功】已添加执行权限：$file"
-        else
-            # 有后缀的文件跳过，并打印提示（可选，可注释掉）
-            echo "【跳过】有后缀的文件：$file"
-        fi
+        # 【兼容版】判断文件名是否包含 "."（无扩展语法，POSIX 标准）
+        # 方法1：用 case 语句匹配后缀（推荐，无外部命令依赖）
+        case "$filename" in
+            *.*) 
+                # 有后缀的文件跳过
+                echo "【跳过】有后缀的文件：$file"
+                ;;
+            *) 
+                # 无后缀文件添加执行权限
+                chmod +x "$file"
+                echo "【成功】已添加执行权限：$file"
+                ;;
+        esac
+        # 【备选方法2】用 grep 匹配（需依赖 grep 命令，效果相同）
+        # if echo "$filename" | grep -q '\.'; then
+        #     echo "【跳过】有后缀的文件：$file"
+        # else
+        #     chmod +x "$file"
+        #     echo "【成功】已添加执行权限：$file"
+        # fi
     fi
 done
 
 echo -e "\n/root/bin目录下可执行文件已加入执行权限"
-
-export PATH=/root/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # 执行传入的命令，通常是启动 supervisord
 exec "$@"
