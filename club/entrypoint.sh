@@ -15,7 +15,7 @@ if [ ! -f "/root/init/.initialized" ]; then
     
 
     # 为二进制文件设置权限并移动到/root/bin下
-    for bin in /root/bin/*; do
+    for bin in /club/bin/*; do
         chmod 755 $bin
         cp -r /club/bin/$bin /root/bin/$bin
     done
