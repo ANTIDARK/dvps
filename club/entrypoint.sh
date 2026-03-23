@@ -55,6 +55,34 @@ else
 fi
 echo "club:$CLUB_PWD" | chpasswd
 
+
+# 第一步：检查目标目录是否存在，不存在则退出
+if [ ! -d "/root/bin" ]; then
+    echo "【错误】目录 /root/bin 不存在，脚本退出！"
+    exit 1
+fi
+
+# 第二步：遍历目标目录下的所有条目
+for file in "/root/bin"/*; do
+    # 过滤：仅处理普通文件（排除目录、符号链接、设备文件等）
+    if [ -f "$file" ]; then
+        # 获取纯文件名（去掉路径，只保留文件名）
+        filename=$(basename "$file")
+        
+        # 判断：文件名中是否包含 "."（即是否有后缀）
+        if [[ "$filename" != *.* ]]; then
+            # 给无后缀文件添加执行权限
+            chmod +x "$file"
+            echo "【成功】已添加执行权限：$file"
+        else
+            # 有后缀的文件跳过，并打印提示（可选，可注释掉）
+            echo "【跳过】有后缀的文件：$file"
+        fi
+    fi
+done
+
+echo -e "\n/root/bin目录下可执行文件已加入执行权限"
+
 export PATH=“/root/bin:$PATH”
 
 # 执行传入的命令，通常是启动 supervisord
