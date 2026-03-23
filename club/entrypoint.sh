@@ -17,12 +17,12 @@ if [ ! -f "/root/init/.initialized" ]; then
     # 为二进制文件设置权限并移动到/root/bin下
     for bin in /root/bin/*; do
         chmod 755 $bin
-        mv /club/bin/$bin /root/bin/$bin
+        cp -r /club/bin/$bin /root/bin/$bin
     done
 
     # 复制必要的配置
-    mv /club/configs/.bashrc /root/.bashrc
-    mv /club/configs/supervisord.conf /root/init/supervisord.conf
+    cp /club/configs/.bashrc /root/.bashrc
+    cp /club/configs/supervisord.conf /root/init/supervisord.conf
 
     # 创建标记文件，表示已初始化
     touch /root/init/.initialized
