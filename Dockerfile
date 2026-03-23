@@ -29,7 +29,7 @@ COPY ./club/entrypoint.sh /club/entrypoint.sh
 WORKDIR /root
 
 # 设置执行权限
-RUN chmod +x /club/entrypoint.sh && cp /club/bin/u* /root/bin
+RUN chmod +x /club/entrypoint.sh 
 
 # 设置入口点
 ENTRYPOINT ["/club/entrypoint.sh"]
