@@ -35,4 +35,4 @@ RUN chmod +x /club/entrypoint.sh
 ENTRYPOINT ["/club/entrypoint.sh"]
 
 # 设置默认命令
-CMD ["/usr/bin/supervisord", "-n", "-c", "/root/supervisord/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/root/init/supervisord.conf"]
