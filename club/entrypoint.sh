@@ -11,24 +11,18 @@ if [ ! -f "/root/init/.initialized" ]; then
     echo "首次启动，执行初始化操作..."
 
     # 创建必要的目录
-    mkdir -p /root/webssh
-    mkdir -p /root/dufs
-    mkdir -p /root/supervisord
-    mkdir -p /root/sshd
+    mkdir -p /root/bin
+    
 
-    # 确保日志目录存在并设置适当的权限
-    for dir in /root/webssh /root/dufs /root/sshd; do
-        mkdir -p $dir
-        touch $dir/${dir##*/}_stdout.log $dir/${dir##*/}_stderr.log
-        chmod 755 $dir
-        chmod 644 $dir/*.log
+    # 为二进制文件设置权限并移动到/root/bin下
+    for bin in /root/bin/*; do
+        chmod 755 $bin
+        mv /club/bin/$bin /root/bin/$bin
     done
 
-    # 复制必要的二进制文件和配置
-    cp /club/configs/.bashrc /root/.bashrc
-    cp -r /club/bin/dufs /root/dufs
-    cp -r /club/bin/webssh /root/webssh
-    cp -r /club/configs/supervisord.conf /root/supervisord/supervisord.conf
+    # 复制必要的配置
+    mv /club/configs/.bashrc /root/.bashrc
+    mv /club/configs/supervisord.conf /root/init/supervisord.conf
 
     # 创建标记文件，表示已初始化
     touch /root/init/.initialized
