@@ -4,6 +4,7 @@ FROM debian:trixie-slim
 # 设置环境变量，避免交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH=/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 # 1. 先更新索引
 RUN apt-get update -qq && \
     # 2. 再升级已装包（非必须，可省）
