@@ -17,7 +17,9 @@ if [ ! -f "/root/init/.initialized" ]; then
     # 为二进制文件设置权限并移动到/root/bin下
     for bin in /club/bin/*; do
         chmod 755 $bin
-        cp -r /club/bin/$bin /root/bin/$bin
+        # 直接使用完整路径$bin，无需额外拼接/club/bin/
+        # 注意：如果/bin下都是文件，-r可以去掉；如果有目录则保留
+        cp -r "$bin" "/root/bin/"
     done
 
     # 复制必要的配置
