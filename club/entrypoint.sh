@@ -89,5 +89,9 @@ done
 
 echo -e "\n/root/bin目录下可执行文件已加入执行权限"
 
+# 强制设置全局 PATH（所有子进程都会继承）
+export PATH=/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+echo -e "\n/root/bin目录已加入执行PATH"
+
 # 执行传入的命令，通常是启动 supervisord
 exec "$@"
