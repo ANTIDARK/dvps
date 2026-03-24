@@ -1,5 +1,4 @@
-name: Build Docker Image (x86 only)
-
+name: Build and Push Docker Image (x86 only)
 on:
   # push:
     # branches: [ club ]
@@ -15,24 +14,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # 保留Node24强制配置
     permissions:
       contents: read
       packages: write
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        # 关键：禁用临时构建器，避免无标签镜像残留
         with:
-          # 关键：强制使用单一平台构建器，禁用多架构
-          driver-opts: |
-            env.BUILDKIT_STEP_LOG_MAX_SIZE=10485760
-          buildkitd-flags: --debug
-          # 显式指定默认平台为linux/amd64
-          platforms: linux/amd64
+          driver-opts: network=host
+          cleanup: true
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
@@ -47,31 +42,27 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/dvps
-          # 简化标签规则，避免架构相关的自动标签
+          # 简化标签规则，确保**每次推送都有明确标签**（杜绝无标签）
           tags: |
-            type=ref,event=branch
-            type=sha,format=short
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/club' }}
-          # 关键：禁用自动生成架构标签
+            type=ref,event=branch,alias=latest # club分支直接打club+latest双标签
+            type=sha,format=short,prefix=sha- # 短SHA标签（如sha-abc123）
+          # 关闭冗余标签生成，减少冲突
           flavor: |
-            latest=false
-            suffix=amd64,onlatest=true
+            latest=true
+            suffix=,onlatest=true
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          # 1. 强制指定仅x86架构
-          platforms: linux/amd64
-          # 2. 禁用多架构清单（关键：避免生成unknown架构）
+          platforms: linux/amd64 # 仅x86架构
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # 3. 强制使用本地构建器，禁用远程
-          builder: ${{ steps.setup-buildx.outputs.name }}
-          # 4. 禁用缓存的多架构元数据（可选，防止缓存污染）
-          cache-from: type=gha,scope=amd64-only
-          cache-to: type=gha,scope=amd64-only,mode=max
-          # 5. 显式指定输出类型为单一平台
-          outputs: type=docker
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # 关键：禁止推送无标签镜像，强制标签关联
+          push-with-digest: false
+          # 清理构建缓存，避免临时层残留
+          no-cache-filter: "*"
