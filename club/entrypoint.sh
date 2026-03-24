@@ -28,7 +28,7 @@ if [ ! -f "/root/init/.initialized" ]; then
 
     # 创建标记文件，表示已初始化
     touch /root/init/.initialized
-    touch /root/init/.club
+    touch /root/init/.root
     echo "初始化完成"
 else
     echo "检测到已初始化，跳过初始化步骤..."
@@ -47,14 +47,14 @@ if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]; then
     ssh-keygen -A
 fi
 
-# 每次启动都设置club用户密码
-CLUB_PWD_FILE="/root/init/.club"
-if [ -f "$CLUB_PWD_FILE" ]; then
-    CLUB_PWD=$(cat "$CLUB_PWD_FILE")
+# 每次启动都设置ROOT用户密码
+ROOT_PWD_FILE="/root/init/.root"
+if [ -f "$ROOT_PWD_FILE" ]; then
+    ROOT_PWD=$(cat "$ROOT_PWD_FILE")
 else
-    CLUB_PWD="123456"
+    ROOT_PWD="123456"
 fi
-echo "club:$CLUB_PWD" | chpasswd
+echo "root:$ROOT_PWD" | chpasswd
 
 
 # 遍历目标目录下的所有条目
