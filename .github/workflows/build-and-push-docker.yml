@@ -1,33 +1,30 @@
-name: Build and Push Docker Image (x86 only)
+name: Build Docker Image (x86 only)
 on:
-  # push:
-    # branches: [ club ]
-    # paths:
-      # - 'Dockerfile'
-      # - 'src/**'
-      # - '.github/workflows/build-docker.yml'
-  # pull_request:
-    # branches: [ club ]
+  push:
+    branches: [ club ]
+    paths:
+      - 'Dockerfile'
+      - 'src/**'
+      - '.github/workflows/build-docker.yml'
+  pull_request:
+    branches: [ club ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # 保留Node24强制配置
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 消除Node20警告
     permissions:
       contents: read
       packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        # 关键：禁用临时构建器，避免无标签镜像残留
-        with:
-          driver-opts: network=host
-          cleanup: true
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
@@ -42,27 +39,19 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/dvps
-          # 简化标签规则，确保**每次推送都有明确标签**（杜绝无标签）
           tags: |
-            type=ref,event=branch,alias=latest # club分支直接打club+latest双标签
-            type=sha,format=short,prefix=sha- # 短SHA标签（如sha-abc123）
-          # 关闭冗余标签生成，减少冲突
-          flavor: |
-            latest=true
-            suffix=,onlatest=true
+            type=ref,event=branch
+            type=sha,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/club' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64 # 仅x86架构
+          platforms: linux/amd64       # 仅构建x86
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # 关键：禁止推送无标签镜像，强制标签关联
-          push-with-digest: false
-          # 清理构建缓存，避免临时层残留
-          no-cache-filter: "*"
