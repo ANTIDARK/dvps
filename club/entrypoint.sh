@@ -40,7 +40,7 @@ fi
 if [ ! -d "/run/sshd" ]; then
     mkdir -p /run/sshd
     chmod 0755 /run/sshd
-    # RUN mkdir -p -m 0755 /run/sshd
+    # mkdir -p -m 0755 /run/sshd
 fi
 
 # 确保 SSH 主机密钥存在（/etc/ssh/ssh_host_rsa_key，/etc/ssh/ssh_host_ecdsa_key，/etc/ssh/ssh_host_ed25519_key）
