@@ -15,11 +15,11 @@ RUN apt-get update -qq && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 创建club用户并设置密码，同时将其加入sudo组,配置无密码sudo
-RUN useradd -m -s /bin/bash club \
-    && echo "club:123456" | chpasswd \
-    # && usermod -aG sudo club
-    addgroup club wheel && \
-    echo "club ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# RUN useradd -m -s /bin/bash club \
+    # && echo "club:123456" | chpasswd \
+    # && usermod -aG sudo club 与下面行为相同作用
+    # addgroup club wheel && \
+    # echo "club ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # 将当前目录的所有文件复制到容器的 /club 目录下
 COPY ./club/bin /club/bin
