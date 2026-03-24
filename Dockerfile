@@ -3,7 +3,8 @@ FROM debian:trixie-slim
 
 # 设置环境变量，避免交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PATH=/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/root/bin:$PATH
+RUN echo 'export PATH=/root/bin:$PATH' >> /etc/profile.d/custom.sh
 
 # 1. 先更新索引
 RUN apt-get update -qq && \
@@ -18,13 +19,11 @@ RUN apt-get update -qq && \
 RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen
 
-# 设置系统环境为中文 UTF-8
+# 设置系统环境为中文 UTF-8,设置时区（上海时区）
 ENV LANG=zh_CN.UTF-8 \
     LC_ALL=zh_CN.UTF-8 \
     TZ=Asia/Shanghai
-
-# 设置时区（上海时区）
-ENV TZ=Asia/Shanghai
+    
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # ====================== 核心：开启 root SSH ======================
