@@ -2,9 +2,13 @@
 FROM debian:trixie-slim
 
 # 设置环境变量，避免交互式安装
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PATH=/root/bin:$PATH
-RUN echo 'export PATH=/root/bin:$PATH' >> /etc/profile.d/custom.sh
+ENV DEBIAN_FRONTEND=noninteractive \
+    # 加入PATH
+    PATH=/root/bin:$PATH \
+    # 设置系统环境为中文 UTF-8,设置时区（上海时区）
+    LANG=zh_CN.UTF-8 \
+    LC_ALL=zh_CN.UTF-8 \
+    TZ=Asia/Shanghai
 
 # 1. 先更新索引
 RUN apt-get update -qq && \
@@ -13,25 +17,17 @@ RUN apt-get update -qq && \
     # 3. 安装你需要的工具，最后清理缓存
     apt-get install -y --no-install-recommends \
     vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip locales ttf-wqy-zenhei ttf-wqy-microhei tzdata && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# 生成中文 UTF-8 locale
-RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen \
-    && locale-gen
-
-# 设置系统环境为中文 UTF-8,设置时区（上海时区）
-ENV LANG=zh_CN.UTF-8 \
-    LC_ALL=zh_CN.UTF-8 \
-    TZ=Asia/Shanghai
-    
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# ====================== 核心：开启 root SSH ======================
-# 1. 设置 root 密码
-RUN echo "root:123456" | chpasswd
-
-# 2. 允许 root 远程登录
-RUN sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    # 生成中文 UTF-8 locale
+    echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen && \
+    # 设置系统环境为中文 UTF-8,设置时区（上海时区）
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+    # 加入PATH
+    echo 'export PATH=/root/bin:$PATH' >> /etc/profile.d/custom.sh && \
+    # 设置 root 密码
+    echo "root:123456" | chpasswd && \
+    # 允许 root 远程登录
+    sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
     sed -i 's/^#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
 
@@ -48,9 +44,10 @@ RUN sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh
     # echo "club ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # 将当前目录的所有文件复制到容器的 /club 目录下
-COPY ./club/bin /club/bin
-COPY ./club/configs /club/configs
-COPY ./club/entrypoint.sh /club/entrypoint.sh
+# COPY ./club/bin /club/bin
+# COPY ./club/configs /club/configs
+# COPY ./club/entrypoint.sh /club/entrypoint.sh
+COPY ./club /club
 
 # 设置工作目录
 WORKDIR /root
