@@ -98,5 +98,7 @@ fi
 #    . /etc/bash_completion
 #fi
 
+# 更新PATH,加入uv命令补全
+export PATH=/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 eval "$(uv generate-shell-completion bash)"
 eval "$(uvx --generate-shell-completion bash)"
