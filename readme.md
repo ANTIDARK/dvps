@@ -1,4 +1,5 @@
 # 我的修改：
+注意：挂载持久化存储到/root。环境变量forceini="true"时会强制初始化
 改基础镜像为debian：trixie-slim  
 取消club用户。直接用root
 增加安装 python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip 等软件  
