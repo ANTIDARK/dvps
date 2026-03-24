@@ -11,8 +11,21 @@ RUN apt-get update -qq && \
     apt-get upgrade -y && \
     # 3. 安装你需要的工具，最后清理缓存
     apt-get install -y --no-install-recommends \
-    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip && \
+    vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip locales ttf-wqy-zenhei ttf-wqy-microhei tzdata && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# 生成中文 UTF-8 locale
+RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen
+
+# 设置系统环境为中文 UTF-8
+ENV LANG=zh_CN.UTF-8 \
+    LC_ALL=zh_CN.UTF-8 \
+    TZ=Asia/Shanghai
+
+# 设置时区（上海时区）
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # ====================== 核心：开启 root SSH ======================
 # 1. 设置 root 密码
@@ -45,6 +58,8 @@ WORKDIR /root
 
 # 设置执行权限
 RUN chmod +x /club/entrypoint.sh 
+
+EXPOSE 8888 5000
 
 # 设置入口点
 ENTRYPOINT ["/club/entrypoint.sh"]
