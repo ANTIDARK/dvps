@@ -23,6 +23,9 @@ RUN sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh
     sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
     sed -i 's/^#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
 
+# 创建 sshd 运行目录
+RUN mkdir -p /run/sshd
+
 # 创建club用户并设置密码，同时将其加入sudo组,配置无密码sudo
 # RUN useradd -m -s /bin/bash club \
     # && echo "club:123456" | chpasswd \
