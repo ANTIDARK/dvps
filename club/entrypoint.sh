@@ -36,13 +36,14 @@ fi
 
 # 每次启动时都要执行的操作
 
-# 配置 SSH 服务
-if [ ! -d "/var/run/sshd" ]; then
-    mkdir -p /var/run/sshd
-    chmod 0755 /var/run/sshd
+# 配置 SSH 服务，/var/run/sshd与/run/sshd等价为运行时目录
+if [ ! -d "/run/sshd" ]; then
+    mkdir -p /run/sshd
+    chmod 0755 /run/sshd
+    # RUN mkdir -p -m 0755 /run/sshd
 fi
 
-# 确保 SSH 主机密钥存在
+# 确保 SSH 主机密钥存在（/etc/ssh/ssh_host_rsa_key，/etc/ssh/ssh_host_ecdsa_key，/etc/ssh/ssh_host_ed25519_key）
 if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]; then
     ssh-keygen -A
 fi
