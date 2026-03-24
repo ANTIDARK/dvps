@@ -1,13 +1,13 @@
 name: Build Docker Image (x86 only)
 on:
-  push:
-    branches: [ club ]
-    paths:
-      - 'Dockerfile'
-      - 'src/**'
-      - '.github/workflows/build-docker.yml'
-  pull_request:
-    branches: [ club ]
+  # push:
+    # branches: [ club ]
+    # paths:
+      #  'Dockerfile'
+      # - 'src/**'
+      # - '.github/workflows/build-docker.yml'
+  # pull_request:
+    # branches: [ club ]
   workflow_dispatch:
 
 jobs:
