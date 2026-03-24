@@ -24,7 +24,9 @@ RUN sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh
     sed -i 's/^#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # 创建 sshd 运行目录
-RUN mkdir -p /run/sshd
+# RUN mkdir -p -m 0755 /run/sshd
+# 生成主机密钥
+# RUN ssh-keygen -A
 
 # 创建club用户并设置密码，同时将其加入sudo组,配置无密码sudo
 # RUN useradd -m -s /bin/bash club \
