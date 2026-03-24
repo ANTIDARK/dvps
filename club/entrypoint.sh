@@ -7,7 +7,7 @@ cd /root
 mkdir -p /root/init
 
 # 检查是否首次启动（通过检查标记文件）
-if [ ! -f "/root/init/.initialized" ]; then
+if [ ! -f "/root/init/.initialized" ] || [ "$forceinit" = "true" ]; then
     echo "首次启动，执行初始化操作..."
 
     # 创建必要的目录
