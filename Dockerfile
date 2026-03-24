@@ -14,6 +14,15 @@ RUN apt-get update -qq && \
     vim supervisor sudo openssh-server iputils-ping net-tools curl ca-certificates python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# ====================== 核心：开启 root SSH ======================
+# 1. 设置 root 密码
+RUN echo "root:123456" | chpasswd
+
+# 2. 允许 root 远程登录
+RUN sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
+
 # 创建club用户并设置密码，同时将其加入sudo组,配置无密码sudo
 # RUN useradd -m -s /bin/bash club \
     # && echo "club:123456" | chpasswd \
