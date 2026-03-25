@@ -1,0 +1,3 @@
+#!/command/execlineb -P
+
+exec /root/bin/dufs -p 5000 --allow-upload -a root:123456@/:rw
