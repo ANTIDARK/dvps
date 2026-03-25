@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     # 加入PATH
     PATH=/root/bin:$PATH \
     # 关键：指定s6-overlay配置目录为/root/init/s6-overlay/
-    S6_OVERLAY_CONFIG_DIR=/root/s6-overlay/ \
+    S6_OVERLAY_CONFIG_DIR=/root/init/s6-overlay/ \
     # s6-overlay通用环境变量（可选，优化体验）
     S6_KEEP_ENV=1 \
     # 服务启动超时（秒，0=禁用）
@@ -67,10 +67,10 @@ RUN apt-get update -qq && \
 # COPY ./club/entrypoint.sh /club/entrypoint.sh
 COPY ./club /club
 
-# 复制自定义s6-overlay配置（./s6-overlay/）到容器内/club
-# COPY ./club/s6-overlay /club/
+# 复制自定义s6-overlay配置（./s6-overlay/）到容器内/club/
+# COPY ./club/configs/s6-overlay /club/
 # 给所有s6 run脚本添加可执行权限（v3必需）
-RUN chmod +x /club/s6-overlay/s6-rc.d/*/run
+RUN chmod +x /club/configs/s6-overlay/s6-rc.d/*/run
 
 # 设置工作目录
 WORKDIR /root
