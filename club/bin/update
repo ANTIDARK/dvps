@@ -62,7 +62,7 @@ local_ver=$(get_local_version "$app")
 
 if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
-  wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/webssh-musl-amd64"
+  wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/webssh-linux-amd64"
   set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
   supervisorctl restart $bin
