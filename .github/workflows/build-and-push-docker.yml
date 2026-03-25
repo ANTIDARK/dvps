@@ -3,7 +3,7 @@ on:
   # push:
     # branches: [ club ]
     # paths:
-      #  'Dockerfile'
+      # - 'Dockerfile'
       # - 'src/**'
       # - '.github/workflows/build-docker.yml'
   # pull_request:
