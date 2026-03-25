@@ -14,11 +14,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
     # 优雅停止超时（秒）
     S6_KILL_GRACETIME=10 \
     # 只读根文件系统（K8s）
-    ENV S6_READ_ONLY_ROOT=1 \
-    # 非 root 运行兼容（K8s）\
-    # ENV S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES=1
+    S6_READ_ONLY_ROOT=1 \
     # 初始化失败行为（2=继续）
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2
+
+# 非 root 运行兼容（K8s）\
+# ENV S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES=1
 
 # 最新版本（2026-03）
 ARG S6_OVERLAY_VERSION=3.2.2.0
