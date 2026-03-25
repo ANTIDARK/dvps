@@ -30,7 +30,7 @@ if [ ! -f "/root/init/.initialized" ] || [ "$forceinit" = "true" ]; then
     # 复制自定义s6-overlay配置（/club/s6-overlay/）到容器内/root/init
     cp -r /club/s6-overlay /root/
     # 给所有s6 run脚本添加可执行权限（v3必需）
-    chmod +x /club/s6-overlay/s6-rc.d/*/run
+    chmod +x /root/s6-overlay/s6-rc.d/*/run
 
     # 创建标记文件，表示已初始化
     touch /root/init/.initialized
