@@ -13,15 +13,16 @@ if [ ! -f "/root/init/.initialized" ] || [ "$forceinit" = "true" ]; then
     # 创建必要的目录
     mkdir -p /root/bin
     
-
     # 为二进制文件设置权限并移动到/root/bin下
-    for bin in /club/bin/*; do
-        chmod 755 $bin
+    #for bin in /club/bin/*; do
+        #chmod 755 $bin
         # 直接使用完整路径$bin，无需额外拼接/club/bin/
         # 注意：如果/bin下都是文件，-r可以去掉；如果有目录则保留
-        cp -r "$bin" "/root/bin/"
-    done
-
+        #cp -r "$bin" "/root/bin/"
+    #done
+    
+    cp -r /club/bin /root/
+    
     # 复制必要的配置
     cp /club/configs/.bashrc /root/.bashrc
     cp /club/configs/supervisord.conf /root/init/supervisord.conf
