@@ -65,7 +65,7 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/webssh-musl-amd64"
   set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
-  supervisorctl restart $bin
+  s6-rc restart $bin
   echo "$bin更新完毕已重启"
 else
   echo "[$app] 已是最新: $remote_ver"
@@ -87,7 +87,7 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   rm -f dufs.tar.gz
   set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
-  supervisorctl restart $bin
+  s6-rc restart $bin
   echo "$bin更新完毕已重启"
 else
   echo "[$app] 已是最新: $remote_ver"
@@ -107,7 +107,7 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/cloudflared-linux-amd64"
   set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
-  supervisorctl restart $bin
+  s6-rc restart $bin
   echo "$bin更新完毕已重启"
 else
   echo "[$app] 已是最新: $remote_ver"
@@ -130,7 +130,7 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/${bin}-core" ]; the
   chmod +x ./${bin}* && mv ./${bin}* $INSTALL_DIR
   rm -f easytier.zip
   set_local_version "$app" "$remote_ver"
-  supervisorctl restart $bin
+  s6-rc restart $bin
   echo "$bin更新完毕已重启"
 else
   echo "[$app] 已是最新: $remote_ver"
@@ -193,7 +193,7 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   rm -f opencode.tar.gz
   set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
-  supervisorctl restart $bin
+  s6-rc restart $bin
   echo "$bin更新完毕已重启"
 else
   echo "[$app] 已是最新: $remote_ver"
@@ -203,7 +203,8 @@ fi
 rm -rf $DOWNLOAD_DIR/*
 echo "临时文件夹已清理"
 
-supervisorctl reread && supervisorctl update
+# 重新加载s6配置（修改/root/s6-overlay/后无需重启容器，直接重载）
+s6-rc-reload
 
 echo -e "\n=== 检查更新全部处理完成 ==="
 ls -lh "$INSTALL_DIR"
