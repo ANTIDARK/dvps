@@ -15,16 +15,22 @@ if [ ! -f "/root/init/.initialized" ] || [ "$forceinit" = "true" ]; then
     
 
     # 为二进制文件设置权限并移动到/root/bin下
-    for bin in /club/bin/*; do
-        chmod 755 $bin
+    #for bin in /club/bin/*; do
+        #chmod 755 $bin
         # 直接使用完整路径$bin，无需额外拼接/club/bin/
         # 注意：如果/bin下都是文件，-r可以去掉；如果有目录则保留
-        cp -r "$bin" "/root/bin/"
-    done
+        #cp -r "$bin" "/root/bin/"
+    #done
+
+    cp -r /club/bin /root/
 
     # 复制必要的配置
     cp /club/configs/.bashrc /root/.bashrc
-    cp /club/configs/supervisord.conf /root/init/supervisord.conf
+
+    # 复制自定义s6-overlay配置（/club/s6-overlay/）到容器内/root/init
+    cp -r /club/s6-overlay /root/
+    # 给所有s6 run脚本添加可执行权限（v3必需）
+    chmod +x /club/s6-overlay/s6-rc.d/*/run
 
     # 创建标记文件，表示已初始化
     touch /root/init/.initialized
