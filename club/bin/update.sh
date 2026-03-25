@@ -1,0 +1,246 @@
+#!/bin/sh
+# 获取root权限
+# sudo su -
+# 建立临时存放文件并进入
+INSTALL_DIR="/root/bin"
+DOWNLOAD_DIR="/root/temp"
+VERSION_FILE="$INSTALL_DIR/.versions"
+[ -d "$DOWNLOAD_DIR" ] || mkdir -p "$DOWNLOAD_DIR"
+cd "$DOWNLOAD_DIR" || exit 1
+
+# 基础依赖检查
+for cmd in wget tar unzip curl; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "错误：请先安装 $cmd"
+    exit 1
+  fi
+done
+
+# 初始化版本文件
+[ -f "$VERSION_FILE" ] || touch "$VERSION_FILE"
+
+# ------------------------------------------------
+# 纯 shell 获取 GitHub latest tag（无 jq）
+# ------------------------------------------------
+get_latest_github_tag() {
+  local repo="$1"
+  curl -sL "https://api.github.com/repos/$repo/releases/latest" \
+  | grep -o '"tag_name": *"[^"]*"' \
+  | head -n1 \
+  | sed -E 's/"tag_name": *"([^"]*)"/\1/'
+}
+
+# ------------------------------------------------
+# 纯 shell 读取本地版本（无 jq）
+# ------------------------------------------------
+get_local_version() {
+  local app="$1"
+  awk -F= -v a="$app" '$1==a{print $2}' "$VERSION_FILE"
+}
+
+# ------------------------------------------------
+# 纯 shell 写入/更新版本（无 jq）
+# ------------------------------------------------
+set_local_version() {
+  local app="$1"
+  local ver="$2"
+  # 先删除旧记录
+  sed -i "/^$app=/d" "$VERSION_FILE"
+  # 追加新记录
+  echo "$app=$ver" >> "$VERSION_FILE"
+}
+
+
+# ------------------------------------------------
+# 1. webssh
+# ------------------------------------------------
+app="webssh"
+repo="CJSen/cm-webssh"
+bin="webssh"
+remote_ver=$(get_latest_github_tag "$repo")
+local_ver=$(get_local_version "$app")
+
+if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
+  echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
+  wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/webssh-musl-amd64"
+  set_local_version "$app" "$remote_ver"
+  chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  supervisorctl restart $bin
+  echo "$bin更新完毕已重启"
+else
+  echo "[$app] 已是最新: $remote_ver"
+fi
+
+# ------------------------------------------------
+# 2. dufs
+# ------------------------------------------------
+app="dufs"
+repo="sigoden/dufs"
+bin="dufs"
+remote_ver=$(get_latest_github_tag "$repo")
+local_ver=$(get_local_version "$app")
+
+if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
+  echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
+  wget -O dufs.tar.gz "https://github.com/$repo/releases/download/$remote_ver/dufs-$remote_ver-x86_64-unknown-linux-musl.tar.gz"
+  tar -zxf dufs.tar.gz -C .
+  rm -f dufs.tar.gz
+  set_local_version "$app" "$remote_ver"
+  chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  supervisorctl restart $bin
+  echo "$bin更新完毕已重启"
+else
+  echo "[$app] 已是最新: $remote_ver"
+fi
+
+# ------------------------------------------------
+# 3. cloudflared
+# ------------------------------------------------
+app="cloudflared"
+repo="cloudflare/cloudflared"
+bin="cloudflared"
+remote_ver=$(get_latest_github_tag "$repo")
+local_ver=$(get_local_version "$app")
+
+if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
+  echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
+  wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/cloudflared-linux-amd64"
+  set_local_version "$app" "$remote_ver"
+  chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  supervisorctl restart $bin
+  echo "$bin更新完毕已重启"
+else
+  echo "[$app] 已是最新: $remote_ver"
+fi
+
+# ------------------------------------------------
+# 4. easytier
+# ------------------------------------------------
+app="easytier"
+repo="EasyTier/EasyTier"
+bin="easytier"
+remote_ver=$(get_latest_github_tag "$repo")
+local_ver=$(get_local_version "$app")
+
+if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/${bin}-core" ]; then
+  echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
+  wget -O easytier.zip "https://github.com/$repo/releases/download/$remote_ver/easytier-linux-x86_64-$remote_ver.zip"
+  # unzip -jo easytier.zip "easytier" -d .
+  unzip -jo easytier.zip -d .
+  chmod +x ./${bin}* && mv ./${bin}* $INSTALL_DIR
+  rm -f easytier.zip
+  set_local_version "$app" "$remote_ver"
+  supervisorctl restart $bin
+  echo "$bin更新完毕已重启"
+else
+  echo "[$app] 已是最新: $remote_ver"
+fi
+
+# ------------------------------------------------
+# 5. uv & uvx
+# ------------------------------------------------
+app="uv"
+repo="astral-sh/uv"
+bin="uv"
+remote_ver=$(get_latest_github_tag "$repo")
+local_ver=$(get_local_version "$app")
+
+if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
+  echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
+  wget -O uv.tar.gz "https://github.com/$repo/releases/download/$remote_ver/uv-x86_64-unknown-linux-musl.tar.gz"
+  tar -zxf uv.tar.gz --strip-components=1 -C .
+  rm -f uv.tar.gz
+  chmod +x ./${bin}* && mv ./${bin}* $INSTALL_DIR
+  set_local_version "$app" "$remote_ver"
+else
+  echo "[$app] 已是最新: $remote_ver"
+fi
+
+
+# ------------------------------------------------
+# 6. opencode
+# ------------------------------------------------
+app="opencode"
+repo="anomalyco/opencode"
+bin="opencode"
+remote_ver=$(get_latest_github_tag "$repo")
+local_ver=$(get_local_version "$app")
+
+if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
+  echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
+  wget -O opencode.tar.gz "https://github.com/${repo}/releases/download/${remote_ver}/opencode-linux-x64.tar.gz"
+  tar -zxf opencode.tar.gz -C .
+  rm -f opencode.tar.gz
+  set_local_version "$app" "$remote_ver"
+  chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+else
+  echo "[$app] 已是最新: $remote_ver"
+fi
+
+# ------------------------------------------------
+# 7. subs-check
+# ------------------------------------------------
+app="subs-check"
+repo="beck-8/subs-check"
+bin="subs-check"
+remote_ver=$(get_latest_github_tag "$repo")
+local_ver=$(get_local_version "$app")
+
+if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
+  echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
+  wget -O subs-check.tar.gz "https://github.com/${repo}/releases/download/$remote_ver/subs-check_Linux_x86_64.tar.gz"
+  tar -zxf subs-check.tar.gz -C .
+  rm -f opencode.tar.gz
+  set_local_version "$app" "$remote_ver"
+  chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  supervisorctl restart $bin
+  echo "$bin更新完毕已重启"
+else
+  echo "[$app] 已是最新: $remote_ver"
+fi
+
+# 清理临时文件
+rm -rf $DOWNLOAD_DIR/*
+echo "临时文件夹已清理"
+
+supervisorctl reread && supervisorctl update
+
+echo -e "\n=== 检查更新全部处理完成 ==="
+ls -lh "$INSTALL_DIR"
+echo -e "\n版本记录文件: $VERSION_FILE"
+
+# 给/root/bin目录下的可执行文件加上执行权限
+# INSTALL_DIR="/root/bin"
+
+# 判断目录是否存在
+if [ ! -d "$INSTALL_DIR" ]; then
+    echo "错误：目录 $INSTALL_DIR 不存在"
+    exit 1
+fi
+
+# 遍历目录下所有项
+for file in "$INSTALL_DIR"/*; do
+    # 1. 只处理普通文件，跳过目录、链接等
+    if [ ! -f "$file" ]; then
+        continue
+    fi
+
+    # 取出文件名（去掉路径）
+    filename=$(basename "$file")
+
+    # 2. 兼容写法：判断文件名是否包含 .，包含则跳过
+    case "$filename" in
+        *.*)
+            # 有后缀，跳过
+            continue
+            ;;
+        *)
+            # 无后缀，加执行权限
+            chmod +x "$file"
+            echo "已添加执行权限: $file"
+            ;;
+    esac
+done
+
+
+
