@@ -126,7 +126,7 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/${bin}-core" ]; the
   echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
   wget -O easytier.zip "https://github.com/$repo/releases/download/$remote_ver/easytier-linux-x86_64-$remote_ver.zip"
   # unzip -jo easytier.zip "easytier" -d .
-  unzip -jo easytier.zip -d .
+  unzip easytier.zip
   chmod +x ./${bin}* && mv ./${bin}* $INSTALL_DIR
   rm -f easytier.zip
   set_local_version "$app" "$remote_ver"
