@@ -21,13 +21,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # 非 root 运行兼容（K8s）\
 # ENV S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES=1
 
-# 最新版本（2026-03）
-ARG S6_OVERLAY_VERSION=3.2.2.0
-
-# 下载s6-overlay
-ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp/ && \
-    https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp/
-
 # 1. 先更新索引
 RUN apt-get update -qq && \
     # 2. 再升级已装包（非必须，可省）
@@ -43,11 +36,14 @@ RUN apt-get update -qq && \
     # 允许 root 远程登录
     sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's/^#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    # 解压缩s6-overlay
-    tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
-    && tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz \
-    && rm -rf /tmp/*
+    sed -i 's/^#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# 最新版本（2026-03）
+ARG S6_OVERLAY_VERSION=3.2.2.0
+
+# 直接下载 s6-overlay 安装包到根目录 /，自动解压
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /
 
 # 创建 sshd 运行目录
 # RUN mkdir -p -m 0755 /run/sshd
