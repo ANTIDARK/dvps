@@ -2,17 +2,17 @@
 注意：挂载持久化存储到/root。环境变量forceini="true"时会强制初始化
 改基础镜像为debian：trixie-slim  
 取消club用户。直接用root  
-加入声明端口
-设置系统环境为中文，设置时区为shanghai
-增加安装 openssh-server sudo python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip locales tzdata 等软件  
-修改/root文件夹下布局，/root/init存放初始化文件和supervisor配置文件，/root/bin存放可执行文件
-增加update（实为update.sh），更新二进制可执行文件
-优化supervisor的配置文件降低资源占用  
-重写docker构建workflow,现仅支持x86
-#修改root密码
-password="password" && echo "$password" | sudo tee /root/init/.root > /dev/null && echo "root:$password" | sudo chpasswd
-#修改dufs密码，然后重启dufs
-sudo sed -i 's/root:[^@]*@/root:password@/' /root/init/supervisord.conf && sudo supervisorctl reread && sudo supervisorctl update
+加入声明端口  
+设置系统环境为中文，设置时区为shanghai  
+增加安装 openssh-server sudo python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip locales tzdata 等软件   
+修改/root文件夹下布局，/root/init存放初始化文件和supervisor配置文件，/root/bin存放可执行文件  
+增加update（实为update.sh），更新二进制可执行文件  
+优化supervisor的配置文件降低资源占用    
+重写docker构建workflow,现仅支持x86  
+#修改root密码  
+password="password" && echo "$password" | sudo tee /root/init/.root > /dev/null && echo "root:$password" | sudo chpasswd  
+#修改dufs密码，然后重启dufs  
+sudo sed -i 's/root:[^@]*@/root:password@/' /root/init/supervisord.conf && sudo supervisorctl reread && sudo supervisorctl update  
 
 # 以下为原说明
 # ClawCloud 环境说明
