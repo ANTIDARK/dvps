@@ -27,7 +27,7 @@ s6-logctl -t s6-overlay show
 # 修改root密码
 password="password" && echo "$password" | sudo tee /root/init/.root > /dev/null && echo "root:$password" | sudo chpasswd
 # 修改dufs密码
-sed -i 's/root:[^@]*@/root:password@/' /root/init/supervisord.conf &&  s6-rc restart dufs
+sed -i 's/root:[^@]*@/root:password@/' /root/init/s6-overlay/s6-rc.d/dufs/run &&  s6-rc restart dufs
 
 
 # 以下为原说明
