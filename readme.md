@@ -4,7 +4,7 @@
 取消club用户。直接用root  
 加入声明端口
 设置系统环境为中文，设置时区为shanghai
-增加安装 openssh-server sudo python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip 等软件  
+增加安装 openssh-server sudo python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip locales tzdata 等软件  
 修改/root文件夹下布局，/root/init存放初始化文件和supervisor配置文件，/root/bin存放可执行文件
 增加update（实为update.sh），更新二进制可执行文件
 优化supervisor的配置文件降低资源占用  
