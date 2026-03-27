@@ -203,6 +203,7 @@ fi
 rm -rf $DOWNLOAD_DIR/*
 echo "临时文件夹已清理"
 
+echo "开始更新升级supervisor运行配置"
 supervisorctl reread && supervisorctl update
 
 echo -e "\n=== 检查更新全部处理完成 ==="
