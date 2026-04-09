@@ -7,7 +7,7 @@
 设置系统环境为中文，设置时区为shanghai
 增加安装 openssh-server sudo python3 python3-pip python3-venv git wget fish micro gh tmux iproute2 iptables procps lrzsz dnsutils tar unzip locales tzdata 等软件  
 修改/root文件夹下布局，/root/init存放初始化文件和s6-overlay配置文件，/root/bin存放可执行文件
-增加update（实为update.sh），更新二进制可执行文件
+自用脚本增加update.sh（更新二进制可执行文件），set-s6-service.sh(s6-overlay服务配置脚本)  
 优化supervisor的配置文件降低资源占用  
 重写docker构建workflow,现仅支持x86__
 # s6-overlay 使用说明
