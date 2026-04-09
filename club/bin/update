@@ -1,12 +1,25 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ====================== 本地版本号配置（更新时自动修改此处）======================
+# 所有本地版本号直接写在脚本里，更新后sed自动替换对应行
+LOCAL_VER_webssh=v1.0.0
+LOCAL_VER_dufs=v0.45.0
+LOCAL_VER_cloudflared=2026.3.0
+LOCAL_VER_easytier=v2.4.5
+LOCAL_VER_uv=0.11.3
+LOCAL_VER_opencode=v1.3.17
+LOCAL_VER_subscheck=v1.5.2
+# ================================================================================
+
 # 获取root权限
 # sudo su -
 # 建立临时存放文件并进入
 INSTALL_DIR="/root/bin"
 DOWNLOAD_DIR="/root/temp"
-VERSION_FILE="$INSTALL_DIR/.versions"
 [ -d "$DOWNLOAD_DIR" ] || mkdir -p "$DOWNLOAD_DIR"
 cd "$DOWNLOAD_DIR" || exit 1
+SCRIPT_SELF="$0"
 
 # 基础依赖检查
 for cmd in wget tar unzip curl; do
@@ -16,8 +29,6 @@ for cmd in wget tar unzip curl; do
   fi
 done
 
-# 初始化版本文件
-[ -f "$VERSION_FILE" ] || touch "$VERSION_FILE"
 
 # ------------------------------------------------
 # 纯 shell 获取 GitHub latest tag（无 jq）
@@ -34,20 +45,17 @@ get_latest_github_tag() {
 # 纯 shell 读取本地版本（无 jq）
 # ------------------------------------------------
 get_local_version() {
-  local app="$1"
-  awk -F= -v a="$app" '$1==a{print $2}' "$VERSION_FILE"
+  local app="LOCAL_VER_$1"
+  awk -F= -v a="${app}" '$1==a{print $2}' "$SCRIPT_SELF"
 }
 
 # ------------------------------------------------
-# 纯 shell 写入/更新版本（无 jq）
+# # 更新脚本自身的版本号
 # ------------------------------------------------
 set_local_version() {
   local app="$1"
   local ver="$2"
-  # 先删除旧记录
-  sed -i "/^$app=/d" "$VERSION_FILE"
-  # 追加新记录
-  echo "$app=$ver" >> "$VERSION_FILE"
+  sed -i "s/^LOCAL_VER_$app=.*/LOCAL_VER_$app=$ver/" "$SCRIPT_SELF"
 }
 
 
@@ -63,8 +71,8 @@ local_ver=$(get_local_version "$app")
 if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
   wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/webssh-linux-amd64"
-  set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  set_local_version "$app" "$remote_ver"
   supervisorctl restart $bin
   echo "$bin更新完毕已重启"
 else
@@ -85,8 +93,8 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   wget -O dufs.tar.gz "https://github.com/$repo/releases/download/$remote_ver/dufs-$remote_ver-x86_64-unknown-linux-musl.tar.gz"
   tar -zxf dufs.tar.gz -C .
   rm -f dufs.tar.gz
-  set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  set_local_version "$app" "$remote_ver"
   supervisorctl restart $bin
   echo "$bin更新完毕已重启"
 else
@@ -105,8 +113,8 @@ local_ver=$(get_local_version "$app")
 if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
   wget -O "$bin" "https://github.com/$repo/releases/download/$remote_ver/cloudflared-linux-amd64"
-  set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  set_local_version "$app" "$remote_ver"
   supervisorctl restart $bin
   echo "$bin更新完毕已重启"
 else
@@ -127,10 +135,10 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/${bin}-core" ]; the
   wget -O easytier.zip "https://github.com/$repo/releases/download/$remote_ver/easytier-linux-x86_64-$remote_ver.zip"
   # unzip -jo easytier.zip "easytier" -d .
   unzip easytier.zip
-  chmod +x ./${bin}* && mv ./${bin}* $INSTALL_DIR
   rm -f easytier.zip
+  chmod +x ./easytier-linux-x86_64/${bin}* && mv ./easytier-linux-x86_64/${bin}* $INSTALL_DIR
   set_local_version "$app" "$remote_ver"
-  supervisorctl restart $bin
+  supervisorctl restart ${bin}-core
   echo "$bin更新完毕已重启"
 else
   echo "[$app] 已是最新: $remote_ver"
@@ -152,10 +160,10 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   rm -f uv.tar.gz
   chmod +x ./${bin}* && mv ./${bin}* $INSTALL_DIR
   set_local_version "$app" "$remote_ver"
+  echo "$bin更新完毕"
 else
   echo "[$app] 已是最新: $remote_ver"
 fi
-
 
 # ------------------------------------------------
 # 6. opencode
@@ -171,8 +179,9 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   wget -O opencode.tar.gz "https://github.com/${repo}/releases/download/${remote_ver}/opencode-linux-x64.tar.gz"
   tar -zxf opencode.tar.gz -C .
   rm -f opencode.tar.gz
-  set_local_version "$app" "$remote_ver"
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  set_local_version "$app" "$remote_ver"
+  echo "$bin更新完毕"
 else
   echo "[$app] 已是最新: $remote_ver"
 fi
@@ -180,7 +189,7 @@ fi
 # ------------------------------------------------
 # 7. subs-check
 # ------------------------------------------------
-app="subs-check"
+app="subscheck"
 repo="beck-8/subs-check"
 bin="subs-check"
 remote_ver=$(get_latest_github_tag "$repo")
@@ -190,9 +199,9 @@ if [ "$local_ver" != "$remote_ver" ] || [ ! -f "$INSTALL_DIR/$bin" ]; then
   echo "[$app] 本地: $local_ver | 最新: $remote_ver → 更新中"
   wget -O subs-check.tar.gz "https://github.com/${repo}/releases/download/$remote_ver/subs-check_Linux_x86_64.tar.gz"
   tar -zxf subs-check.tar.gz -C .
-  rm -f opencode.tar.gz
-  set_local_version "$app" "$remote_ver"
+  rm -f subs-check.tar.gz
   chmod +x ./$bin && mv ./$bin $INSTALL_DIR
+  set_local_version "$app" "$remote_ver"
   supervisorctl restart $bin
   echo "$bin更新完毕已重启"
 else
@@ -208,7 +217,7 @@ supervisorctl reread && supervisorctl update
 
 echo -e "\n=== 检查更新全部处理完成 ==="
 ls -lh "$INSTALL_DIR"
-echo -e "\n版本记录文件: $VERSION_FILE"
+echo -e "\n版本号已全部记录在脚本自身内部，无需外部版本文件"
 
 # 给/root/bin目录下的可执行文件加上执行权限
 # INSTALL_DIR="/root/bin"
