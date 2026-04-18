@@ -1,5 +1,5 @@
 # 我的修改：
-注意：挂载持久化存储到/root。环境变量forceini="true"时会强制初始化
+注意：挂载持久化存储到/root。环境变量forceini="true"时会强制初始化  
 改基础镜像为debian：trixie-slim  
 取消club用户。直接用root  
 加入声明端口  
