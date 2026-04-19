@@ -1,0 +1,35 @@
+name: ClawCloud Auto Login
+
+on:
+  schedule:
+    # 每 5 天运行一次（北京时间凌晨 4:15）
+    - cron: '15 20 */5 * *'
+  workflow_dispatch: # 允许手动点击运行测试
+
+jobs:
+  check_in:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute Login Request
+        run: |
+          # 使用 curl 访问你指定的地址
+          # -s: 静默, -o /dev/null: 不打印网页内容, -w: 打印状态码
+          # -L: 跟随重定向, -k: 忽略证书错误
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -L -k \
+            -A "${{ secrets.CLAW_UA }}" \
+            -H "Cookie: ${{ secrets.CLAW_COOKIE }}" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" \
+            "https://us-west-1.run.claw.cloud/")
+
+          echo "访问时间: $(date)"
+          echo "HTTP 状态码: $STATUS_CODE"
+
+          if [ "$STATUS_CODE" -eq 200 ]; then
+            echo "✅ ClawCloud 保活成功！"
+          elif [ "$STATUS_CODE" -eq 302 ] || [ "$STATUS_CODE" -eq 301 ]; then
+            echo "⚠️ 发生了重定向，可能需要检查 URL 或 Cookie 是否触发了登录页跳转。"
+          else
+            echo "❌ 保活失败，状态码为 $STATUS_CODE"
+            exit 1 # 标记任务失败，GitHub 会给你发邮件提醒
+          fi
